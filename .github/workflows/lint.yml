@@ -13,9 +13,16 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
-      - name: Lint
+      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
+      - name: Lint Dockerfiles
         run: |
           echo "::add-matcher::.github/hadolint-matcher.json"
           make lint-docker
           echo "::remove-matcher owner=hadolint::"
+      - name: Install shellcheck
+        run: sudo apt-get install -y shellcheck
+      - name: Lint Shell Scripts
+        run: |
+          echo "::add-matcher::.github/shellcheck-matcher.json"
+          make lint-sh
+          echo "::remove-matcher owner=shellcheck::"

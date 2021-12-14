@@ -16,7 +16,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
+      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
 
       - name: Login to DockerHub
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
@@ -47,7 +47,7 @@ jobs:
 
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@3a3bb3a81753dc99f090d24ee7e5343838b73a96
+        uses: docker/metadata-action@e5622373a38e60fb6d795a4421e56882f2d7a681
         with:
           images: |
             continuumio/anaconda-pkg-build
@@ -68,4 +68,31 @@ jobs:
             BASEVERSION=7
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          push: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags') }}
+
+      - name: Docker meta for Concourse
+        id: concourse-meta
+        uses: docker/metadata-action@e5622373a38e60fb6d795a4421e56882f2d7a681
+        with:
+          images: |
+            continuumio/anaconda-pkg-build
+            public.ecr.aws/y0o4y9o3/anaconda-pkg-build
+          tags: |
+            type=ref,event=branch,suffix=-amd64
+            type=ref,event=pr,suffix=-amd64
+            type=match,pattern=pkg-build-(.*),group=1,suffix=-amd64
+          flavor: |
+            latest=false
+
+      - name: build-push pkg-builder-concourse
+        uses: docker/build-push-action@a66e35b9cbcf4ad0ea91ffcaf7bbad63ad9e0229
+        with:
+          context: ./anaconda-pkg-build/linux
+          builder: ${{ steps.buildx.outputs.name }}
+          file: ./anaconda-pkg-build/linux/Dockerfile
+          platforms: linux/amd64
+          build-args: |
+            BASEVERSION=7
+          tags: ${{ steps.concourse-meta.outputs.tags }}
+          labels: ${{ steps.concourse-meta.outputs.labels }}
           push: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags') }}
