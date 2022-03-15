@@ -24,7 +24,7 @@ jobs:
           driver-opts: network=host
 
       - name: build anaconda3/alpine
-        uses: docker/build-push-action@a66e35b9cbcf4ad0ea91ffcaf7bbad63ad9e0229
+        uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
         with:
           context: ./anaconda3/alpine
           builder: ${{ steps.buildx.outputs.name }}
