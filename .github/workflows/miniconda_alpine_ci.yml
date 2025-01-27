@@ -45,7 +45,7 @@ jobs:
             latest=false
 
       - name: build miniconda3/alpine
-        uses: docker/build-push-action@a66e35b9cbcf4ad0ea91ffcaf7bbad63ad9e0229
+        uses: docker/build-push-action@ca877d9245402d1537745e0e356eab47c3520991
         with:
           context: ./miniconda3/alpine
           builder: ${{ steps.buildx.outputs.name }}
